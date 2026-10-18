@@ -1,0 +1,90 @@
+<section class="mx-auto w-full max-w-md py-10" aria-labelledby="login-title">
+  <div class="card card-border bg-base-100 shadow-sm">
+    <div class="card-body">
+      @if (errorMessage()) {
+        <div class="alert alert-error" role="alert" aria-live="assertive">
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (auth.currentUser(); as user) {
+        <h1 class="card-title" id="login-title">Be vagy jelentkezve</h1>
+        <p>{{ user.email }}</p>
+        <button class="btn btn-block" type="button" (click)="logout()">Kijelentkezés</button>
+      } @else {
+        <h1 class="card-title" id="login-title">Bejelentkezés</h1>
+        <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+          <div class="mb-4">
+            <label class="floating-label">
+              <input
+                id="email"
+                class="input w-full"
+                type="email"
+                formControlName="email"
+                autocomplete="username"
+                placeholder="E-mail cím"
+                [attr.aria-invalid]="
+                  loginForm.controls.email.invalid && loginForm.controls.email.touched
+                "
+                [attr.aria-describedby]="
+                  loginForm.controls.email.invalid && loginForm.controls.email.touched
+                    ? 'email-error'
+                    : null
+                "
+              />
+              <span>E-mail cím</span>
+            </label>
+            @if (
+              loginForm.controls.email.touched && loginForm.controls.email.hasError('required')
+            ) {
+              <p class="mt-1 text-sm text-error" id="email-error">Add meg az e-mail címedet.</p>
+            } @else if (
+              loginForm.controls.email.touched && loginForm.controls.email.hasError('email')
+            ) {
+              <p class="mt-1 text-sm text-error" id="email-error">
+                Adj meg egy érvényes e-mail címet.
+              </p>
+            }
+          </div>
+
+          <div class="mb-6">
+            <label class="floating-label">
+              <input
+                id="password"
+                class="input w-full"
+                type="password"
+                formControlName="password"
+                autocomplete="current-password"
+                placeholder="Jelszó"
+                [attr.aria-invalid]="
+                  loginForm.controls.password.invalid && loginForm.controls.password.touched
+                "
+                [attr.aria-describedby]="
+                  loginForm.controls.password.invalid && loginForm.controls.password.touched
+                    ? 'password-error'
+                    : null
+                "
+              />
+              <span>Jelszó</span>
+            </label>
+            @if (
+              loginForm.controls.password.touched &&
+              loginForm.controls.password.hasError('required')
+            ) {
+              <p class="mt-1 text-sm text-error" id="password-error">Add meg a jelszavadat.</p>
+            }
+          </div>
+
+          <button class="btn btn-block" type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span class="loading loading-spinner" aria-hidden="true"></span>
+              Bejelentkezés...
+            } @else {
+              Bejelentkezés
+            }
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+</section>
