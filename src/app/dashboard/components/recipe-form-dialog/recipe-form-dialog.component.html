@@ -1,12 +1,8 @@
 <dialog class="modal modal-open" open aria-labelledby="create-title" aria-modal="true">
-  <div
-    class="modal-box max-w-2xl bg-base-100 max-sm:max-h-screen"
-  >
+  <div class="modal-box max-w-2xl bg-base-100 max-sm:max-h-screen">
     <div class="mb-5 flex items-start justify-between border-b border-base-300 pb-4">
       <div>
-        <p class="mb-2 text-xs font-bold tracking-widest text-earth">
-          A GYŰJTEMÉNYEDHEZ
-        </p>
+        <p class="mb-2 text-xs font-bold tracking-widest text-earth">A GYŰJTEMÉNYEDHEZ</p>
         <h2 id="create-title" class="m-0 font-serif text-3xl font-normal text-ink">
           {{ initialRecipe() ? 'Recept szerkesztése' : 'Új recept' }}
         </h2>
@@ -17,27 +13,93 @@
         aria-label="Bezárás"
         (click)="dismiss.emit()"
       >
-        ×
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-x preview-icon"
+        >
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
       </button>
     </div>
-    <form class="grid gap-4" [formGroup]="recipeForm" (ngSubmit)="submit()">
+    <form class="grid gap-4" [formGroup]="recipeForm" (ngSubmit)="submit()" novalidate>
       <label class="form-control grid gap-1.5">
         <span class="text-sm font-bold text-base-content">Recept neve</span>
-        <input class="input input-bordered w-full bg-white" formControlName="title" required />
+        <input
+          id="recipe-title"
+          class="input input-bordered w-full bg-white"
+          [class.input-error]="
+            recipeForm.controls.title.invalid && recipeForm.controls.title.touched
+          "
+          [attr.aria-invalid]="
+            recipeForm.controls.title.invalid && recipeForm.controls.title.touched
+          "
+          [attr.aria-describedby]="
+            recipeForm.controls.title.invalid && recipeForm.controls.title.touched
+              ? 'recipe-title-error'
+              : null
+          "
+          formControlName="title"
+        />
+        @if (recipeForm.controls.title.touched && recipeForm.controls.title.hasError('required')) {
+          <span class="text-sm text-error" id="recipe-title-error">A recept neve kötelező.</span>
+        }
       </label>
       <label class="form-control grid gap-1.5">
         <span class="text-sm font-bold text-base-content">Rövid leírás</span>
         <textarea
+          id="recipe-description"
           class="textarea textarea-bordered w-full bg-white"
+          [class.textarea-error]="
+            recipeForm.controls.description.invalid && recipeForm.controls.description.touched
+          "
+          [attr.aria-invalid]="
+            recipeForm.controls.description.invalid && recipeForm.controls.description.touched
+          "
+          [attr.aria-describedby]="
+            recipeForm.controls.description.invalid && recipeForm.controls.description.touched
+              ? 'recipe-description-error'
+              : null
+          "
           formControlName="description"
           rows="2"
-          required
         ></textarea>
+        @if (
+          recipeForm.controls.description.touched &&
+          recipeForm.controls.description.hasError('required')
+        ) {
+          <span class="text-sm text-error" id="recipe-description-error">
+            A rövid leírás kötelező.
+          </span>
+        }
       </label>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label class="form-control grid gap-1.5">
           <span class="text-sm font-bold text-base-content">Kategória</span>
-          <select class="select select-bordered w-full bg-white" formControlName="category">
+          <select
+            id="recipe-category"
+            class="select select-bordered w-full bg-white"
+            [class.select-error]="
+              recipeForm.controls.category.invalid && recipeForm.controls.category.touched
+            "
+            [attr.aria-invalid]="
+              recipeForm.controls.category.invalid && recipeForm.controls.category.touched
+            "
+            [attr.aria-describedby]="
+              recipeForm.controls.category.invalid && recipeForm.controls.category.touched
+                ? 'recipe-category-error'
+                : null
+            "
+            formControlName="category"
+          >
             @if (initialRecipe(); as recipe) {
               @if (!['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Snack'].includes(recipe.category)) {
                 <option [value]="recipe.category">{{ recipe.category }}</option>
@@ -49,6 +111,14 @@
             <option>Desszert</option>
             <option>Snack</option>
           </select>
+          @if (
+            recipeForm.controls.category.touched &&
+            recipeForm.controls.category.hasError('required')
+          ) {
+            <span class="text-sm text-error" id="recipe-category-error">
+              Válassz kategóriát.
+            </span>
+          }
         </label>
         <label class="form-control grid gap-1.5">
           <span class="text-sm font-bold text-base-content">Nehézség</span>
@@ -71,22 +141,60 @@
             >Hozzávalók <span class="font-normal text-base-content/60">soronként egy</span></span
           >
           <textarea
+            id="recipe-ingredients"
             class="textarea textarea-bordered w-full bg-white"
+            [class.textarea-error]="
+              recipeForm.controls.ingredients.invalid && recipeForm.controls.ingredients.touched
+            "
+            [attr.aria-invalid]="
+              recipeForm.controls.ingredients.invalid && recipeForm.controls.ingredients.touched
+            "
+            [attr.aria-describedby]="
+              recipeForm.controls.ingredients.invalid && recipeForm.controls.ingredients.touched
+                ? 'recipe-ingredients-error'
+                : null
+            "
             formControlName="ingredients"
             rows="4"
-            required
           ></textarea>
+          @if (
+            recipeForm.controls.ingredients.touched &&
+            recipeForm.controls.ingredients.hasError('required')
+          ) {
+            <span class="text-sm text-error" id="recipe-ingredients-error">
+              Adj meg legalább egy hozzávalót.
+            </span>
+          }
         </label>
         <label class="form-control grid gap-1">
           <span class="text-sm font-bold text-base-content"
-            >Elkészítés <span class="font-normal text-base-content/60">soronként egy lépés</span></span
+            >Elkészítés
+            <span class="font-normal text-base-content/60">soronként egy lépés</span></span
           >
           <textarea
+            id="recipe-steps"
             class="textarea textarea-bordered w-full bg-white"
+            [class.textarea-error]="
+              recipeForm.controls.steps.invalid && recipeForm.controls.steps.touched
+            "
+            [attr.aria-invalid]="
+              recipeForm.controls.steps.invalid && recipeForm.controls.steps.touched
+            "
+            [attr.aria-describedby]="
+              recipeForm.controls.steps.invalid && recipeForm.controls.steps.touched
+                ? 'recipe-steps-error'
+                : null
+            "
             formControlName="steps"
             rows="4"
-            required
           ></textarea>
+          @if (
+            recipeForm.controls.steps.touched && recipeForm.controls.steps.hasError('required')
+          ) {
+            <span class="text-sm text-error" id="recipe-steps-error">
+              Adj meg legalább egy elkészítési lépést.
+            </span>
+          }
         </label>
       </div>
       @if (errorMessage()) {

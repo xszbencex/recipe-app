@@ -19,7 +19,7 @@ export class RecipeFormDialogComponent implements OnInit {
     description: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     category: new FormControl('Vacsora', { nonNullable: true, validators: [Validators.required] }),
     difficulty: new FormControl<Recipe['difficulty']>('easy', { nonNullable: true }),
-    imageUrl: new FormControl('', { nonNullable: true }),
+    imageUrl: new FormControl<string | null>(null),
     ingredients: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     steps: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
@@ -35,7 +35,7 @@ export class RecipeFormDialogComponent implements OnInit {
       description: recipe.description,
       category: recipe.category,
       difficulty: recipe.difficulty,
-      imageUrl: recipe.imageUrl ?? '',
+      imageUrl: recipe.imageUrl || null,
       ingredients: recipe.ingredients.join('\n'),
       steps: recipe.steps.join('\n'),
     });
@@ -53,7 +53,7 @@ export class RecipeFormDialogComponent implements OnInit {
       description: value.description.trim(),
       category: value.category,
       difficulty: value.difficulty,
-      imageUrl: value.imageUrl.trim() || undefined,
+      imageUrl: value.imageUrl ? value.imageUrl.trim() : null,
       ingredients: this.lines(value.ingredients),
       steps: this.lines(value.steps),
     });

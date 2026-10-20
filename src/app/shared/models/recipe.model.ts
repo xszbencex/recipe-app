@@ -8,6 +8,6 @@ export interface Recipe {
   difficulty: 'easy' | 'medium' | 'hard';
   ingredients: string[];
   steps: string[];
-  imageUrl?: string;
+  imageUrl: string | null;
   createdAt?: Timestamp;
 }
