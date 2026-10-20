@@ -45,8 +45,10 @@
     aria-label="Receptek"
   >
     @for (recipe of recipes(); track recipe.id; let index = $index) {
-      <article
-        class="card card-border overflow-hidden rounded-box border-base-300 bg-base-100/80 shadow-recipe-card transition-all duration-200 hover:-translate-y-1 hover:shadow-recipe-card-hover"
+      <a
+        class="card card-border overflow-hidden rounded-box border-base-300 bg-base-100/80 text-base-content no-underline shadow-recipe-card transition-all duration-200 hover:-translate-y-1 hover:shadow-recipe-card-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+        [routerLink]="['/recipes', recipe.id]"
+        [attr.aria-label]="'Recept megtekintése: ' + recipe.title"
       >
         <figure class="relative m-0 grid h-52 place-items-center overflow-hidden bg-base-300">
           @if (recipe.imageUrl) {
@@ -91,7 +93,7 @@
             }
           </div>
         </div>
-      </article>
+      </a>
     }
   </section>
 } @else {

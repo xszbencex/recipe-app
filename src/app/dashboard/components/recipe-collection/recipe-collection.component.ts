@@ -1,10 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Recipe } from '../../../shared/models/recipe.model';
 
 @Component({
   selector: 'app-recipe-collection',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './recipe-collection.component.html',
 })
 export class RecipeCollectionComponent {

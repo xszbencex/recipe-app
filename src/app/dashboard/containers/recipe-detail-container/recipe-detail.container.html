@@ -1,0 +1,142 @@
+@if (isLoading()) {
+  <main class="grid min-h-screen place-items-center px-4 py-16" role="status">
+    <div class="grid justify-items-center gap-3 text-center text-muted">
+      <span class="loading loading-spinner loading-md" aria-hidden="true"></span>
+      <span>Recept betöltése...</span>
+    </div>
+  </main>
+} @else if (recipe(); as recipe) {
+  <main class="min-h-screen bg-base-100">
+    <section
+      class="relative isolate flex min-h-80 items-end overflow-hidden bg-base-300 sm:min-h-96 lg:min-h-[30rem]"
+      aria-labelledby="recipe-title"
+    >
+      @if (recipe.imageUrl) {
+        <img
+          class="absolute inset-0 -z-20 size-full object-cover"
+          [src]="recipe.imageUrl"
+          [alt]="recipe.title"
+        />
+      } @else {
+        <div
+          class="absolute inset-0 -z-20 grid place-items-center bg-linear-to-br from-base-300 to-base-200 font-serif text-9xl text-base-content/30"
+          aria-hidden="true"
+        >
+          {{ recipe.title.slice(0, 1).toUpperCase() }}
+        </div>
+      }
+      <div class="absolute inset-0 -z-10 bg-linear-to-t from-black/75 via-black/25 to-black/10"></div>
+
+      <a
+        class="btn btn-square btn-ghost absolute top-4 left-4 border border-white/50 bg-base-100/90 text-base-content shadow-sm sm:top-6 sm:left-6"
+        routerLink="/"
+        aria-label="Vissza a receptekhez"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </a>
+
+      <div class="mx-auto w-full max-w-6xl px-5 pt-24 pb-8 sm:px-8 sm:pb-10 lg:px-10">
+        <p class="mb-3 text-xs font-bold tracking-[0.18em] text-white/90 uppercase">
+          {{ recipe.category }} · {{ difficultyLabel(recipe.difficulty) }}
+        </p>
+        <h1
+          id="recipe-title"
+          class="m-0 max-w-4xl font-serif text-4xl leading-tight font-normal text-white drop-shadow-sm sm:text-5xl lg:text-6xl"
+        >
+          {{ recipe.title }}
+        </h1>
+      </div>
+    </section>
+
+    <div class="mx-auto max-w-6xl px-5 pt-7 pb-10 sm:px-8 sm:pt-9 sm:pb-14 lg:px-10">
+      <p class="mb-8 max-w-3xl text-base leading-relaxed text-base-content/70 sm:mb-10 sm:text-lg">
+        {{ recipe.description }}
+      </p>
+
+      <div class="grid grid-cols-1 gap-10 sm:gap-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.5fr)] md:gap-14">
+        <section aria-labelledby="ingredients-heading">
+          <h2
+            id="ingredients-heading"
+            class="mb-5 border-b border-base-300 pb-3 font-serif text-2xl font-normal text-ink sm:text-3xl"
+          >
+            Hozzávalók
+          </h2>
+          @if (recipe.ingredients.length) {
+            <ul class="m-0 grid list-none gap-3 p-0">
+              @for (ingredient of recipe.ingredients; track $index) {
+                <li class="flex items-start gap-3 leading-relaxed text-base-content/80">
+                  <span class="mt-2 size-2 shrink-0 rounded-full bg-earth" aria-hidden="true"></span>
+                  <span>{{ ingredient }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="m-0 text-base-content/60">Nincsenek megadva hozzávalók.</p>
+          }
+        </section>
+
+        <section aria-labelledby="method-heading">
+          <h2
+            id="method-heading"
+            class="mb-5 border-b border-base-300 pb-3 font-serif text-2xl font-normal text-ink sm:text-3xl"
+          >
+            Elkészítés
+          </h2>
+          @if (recipe.steps.length) {
+            <ol class="m-0 grid list-none gap-4 p-0">
+              @for (step of recipe.steps; track $index; let index = $index) {
+                <li class="flex items-start gap-3 leading-relaxed text-base-content/80 sm:gap-4">
+                  <span
+                    class="grid size-7 shrink-0 place-items-center rounded-full bg-success/15 text-sm font-bold text-success"
+                    aria-hidden="true"
+                  >
+                    {{ index + 1 }}
+                  </span>
+                  <span class="pt-0.5">{{ step }}</span>
+                </li>
+              }
+            </ol>
+          } @else {
+            <p class="m-0 text-base-content/60">Nincsenek megadva elkészítési lépések.</p>
+          }
+        </section>
+      </div>
+
+      @if (recipe.createdAt; as createdAt) {
+        <div class="mt-10 border-t border-base-300 pt-4 text-sm text-base-content/60 sm:mt-12">
+          Elmentve:
+          <time>{{ createdAt.toDate() | date: 'yyyy. MMM d.' }}</time>
+        </div>
+      }
+    </div>
+  </main>
+} @else {
+  <main class="grid min-h-screen place-items-center px-4 py-16">
+    <section class="grid max-w-md justify-items-center gap-4 text-center" aria-labelledby="recipe-error-title">
+      <h1 id="recipe-error-title" class="m-0 font-serif text-3xl font-normal text-ink">
+        {{ errorMessage() }}
+      </h1>
+      <p class="m-0 text-sm text-base-content/70">
+        Lehet, hogy a receptet törölték, vagy már nem érhető el a fiókodból.
+      </p>
+      @if (isRetryable()) {
+        <button class="btn" type="button" (click)="loadRecipe(recipeId())">
+          Újrapróbálás
+        </button>
+      }
+      <a class="btn btn-ghost" routerLink="/">Vissza a receptekhez</a>
+    </section>
+  </main>
+}

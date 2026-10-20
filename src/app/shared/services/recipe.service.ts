@@ -6,6 +6,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  getDoc,
   query,
   serverTimestamp,
   updateDoc,
@@ -24,6 +25,23 @@ export interface RecipeFilters {
   providedIn: 'root',
 })
 export class RecipeService {
+  async getRecipe(id: string): Promise<Recipe | null> {
+    const user = auth.currentUser;
+    if (!user) {
+      return null;
+    }
+
+    const recipeSnapshot = await getDoc(doc(db, 'recipes', id));
+    if (!recipeSnapshot.exists() || recipeSnapshot.data()['authorId'] !== user.uid) {
+      return null;
+    }
+
+    return {
+      ...recipeSnapshot.data(),
+      id: recipeSnapshot.id,
+    } as Recipe;
+  }
+
   async getRecipes(filters: RecipeFilters = {}): Promise<Recipe[]> {
     const user = auth.currentUser;
     if (!user) {
