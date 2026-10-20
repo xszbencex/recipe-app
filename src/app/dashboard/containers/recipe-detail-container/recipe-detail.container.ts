@@ -1,12 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Recipe } from '../../../shared/models/recipe.model';
 import { RecipeService } from '../../../shared/services/recipe.service';
+import { RecipeFormDialogComponent } from '../../components/recipe-form-dialog/recipe-form-dialog.component';
 
 @Component({
   selector: 'app-recipe-detail-container',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, RecipeFormDialogComponent],
   host: {
     class: 'block min-h-screen bg-base-200 font-sans text-base-content',
   },
@@ -18,7 +19,12 @@ export class RecipeDetailContainerComponent implements OnInit {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly isRetryable = signal(false);
   protected readonly recipeId = signal('');
+  protected readonly isEditOpen = signal(false);
+  protected readonly isSaving = signal(false);
+  protected readonly isDeleting = signal(false);
+  protected readonly deleteError = signal<string | null>(null);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly recipeService = inject(RecipeService);
 
   ngOnInit(): void {
@@ -56,5 +62,77 @@ export class RecipeDetailContainerComponent implements OnInit {
 
   protected difficultyLabel(difficulty: Recipe['difficulty']): string {
     return { easy: 'Könnyű', medium: 'Közepes', hard: 'Haladó' }[difficulty];
+  }
+
+  protected openEditForm(): void {
+    this.errorMessage.set(null);
+    this.isEditOpen.set(true);
+  }
+
+  protected async saveRecipe(changes: Omit<Recipe, 'id' | 'createdAt'>): Promise<void> {
+    const recipe = this.recipe();
+    if (!recipe) {
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.errorMessage.set(null);
+    try {
+      await this.recipeService.updateRecipe(recipe.id, changes);
+      this.recipe.set({ ...recipe, ...changes });
+      this.isEditOpen.set(false);
+    } catch {
+      this.errorMessage.set('A recept mentése nem sikerült. Próbáld újra.');
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
+  protected closeEditForm(): void {
+    this.isEditOpen.set(false);
+    this.errorMessage.set(null);
+  }
+
+  protected openDeleteConfirmation(dialog: HTMLDialogElement): void {
+    this.deleteError.set(null);
+    dialog.showModal();
+  }
+
+  protected onDeleteDialogCancel(event: Event): void {
+    if (this.isDeleting()) {
+      event.preventDefault();
+    }
+  }
+
+  protected onDeleteDialogClose(): void {
+    if (!this.isDeleting()) {
+      this.deleteError.set(null);
+    }
+  }
+
+  protected closeDeleteConfirmation(dialog: HTMLDialogElement): void {
+    if (this.isDeleting()) {
+      return;
+    }
+
+    dialog.close();
+  }
+
+  protected async deleteRecipe(): Promise<void> {
+    const recipe = this.recipe();
+    if (!recipe || this.isDeleting()) {
+      return;
+    }
+
+    this.isDeleting.set(true);
+    this.deleteError.set(null);
+    try {
+      await this.recipeService.deleteRecipe(recipe.id);
+      await this.router.navigateByUrl('/');
+    } catch {
+      this.deleteError.set('A recept törlése nem sikerült. Próbáld újra.');
+    } finally {
+      this.isDeleting.set(false);
+    }
   }
 }

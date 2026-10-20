@@ -5,6 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  DocumentReference,
   getDocs,
   getDoc,
   query,
@@ -91,11 +92,28 @@ export class RecipeService {
     return recipeRef.id;
   }
 
-  updateRecipe(id: string, changes: Partial<Omit<Recipe, 'id' | 'createdAt'>>): Promise<void> {
-    return updateDoc(doc(db, 'recipes', id), changes);
+  async updateRecipe(id: string, changes: Omit<Recipe, 'id' | 'createdAt'>): Promise<void> {
+    const recipeRef = await this.getOwnedRecipeReference(id);
+    await updateDoc(recipeRef, changes);
   }
 
-  deleteRecipe(id: string): Promise<void> {
-    return deleteDoc(doc(db, 'recipes', id));
+  async deleteRecipe(id: string): Promise<void> {
+    const recipeRef = await this.getOwnedRecipeReference(id);
+    await deleteDoc(recipeRef);
+  }
+
+  private async getOwnedRecipeReference(id: string): Promise<DocumentReference> {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('A recept módosításához be kell jelentkezned.');
+    }
+
+    const recipeRef = doc(db, 'recipes', id);
+    const recipeSnapshot = await getDoc(recipeRef);
+    if (!recipeSnapshot.exists() || recipeSnapshot.data()['authorId'] !== user.uid) {
+      throw new Error('A recept nem található, vagy nincs jogosultságod a módosításához.');
+    }
+
+    return recipeRef;
   }
 }

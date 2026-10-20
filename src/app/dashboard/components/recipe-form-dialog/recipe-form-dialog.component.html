@@ -7,7 +7,9 @@
         <p class="mb-2 text-xs font-bold tracking-widest text-earth">
           A GYŰJTEMÉNYEDHEZ
         </p>
-        <h2 id="create-title" class="m-0 font-serif text-3xl font-normal text-ink">Új recept</h2>
+        <h2 id="create-title" class="m-0 font-serif text-3xl font-normal text-ink">
+          {{ initialRecipe() ? 'Recept szerkesztése' : 'Új recept' }}
+        </h2>
       </div>
       <button
         class="btn btn-ghost btn-square"
@@ -36,6 +38,11 @@
         <label class="form-control grid gap-1.5">
           <span class="text-sm font-bold text-base-content">Kategória</span>
           <select class="select select-bordered w-full bg-white" formControlName="category">
+            @if (initialRecipe(); as recipe) {
+              @if (!['Reggeli', 'Ebéd', 'Vacsora', 'Desszert', 'Snack'].includes(recipe.category)) {
+                <option [value]="recipe.category">{{ recipe.category }}</option>
+              }
+            }
             <option>Reggeli</option>
             <option>Ebéd</option>
             <option>Vacsora</option>
@@ -91,7 +98,7 @@
           @if (isSaving()) {
             <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
           }
-          Recept mentése
+          {{ initialRecipe() ? 'Változtatások mentése' : 'Recept mentése' }}
         </button>
       </div>
     </form>

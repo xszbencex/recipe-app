@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, OnInit, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Recipe } from '../../../shared/models/recipe.model';
 
@@ -7,7 +7,8 @@ import { Recipe } from '../../../shared/models/recipe.model';
   imports: [ReactiveFormsModule],
   templateUrl: './recipe-form-dialog.component.html',
 })
-export class RecipeFormDialogComponent {
+export class RecipeFormDialogComponent implements OnInit {
+  readonly initialRecipe = input<Recipe | null>(null);
   readonly isSaving = input(false);
   readonly errorMessage = input<string | null>(null);
   readonly dismiss = output<void>();
@@ -22,6 +23,23 @@ export class RecipeFormDialogComponent {
     ingredients: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     steps: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
+
+  ngOnInit(): void {
+    const recipe = this.initialRecipe();
+    if (!recipe) {
+      return;
+    }
+
+    this.recipeForm.patchValue({
+      title: recipe.title,
+      description: recipe.description,
+      category: recipe.category,
+      difficulty: recipe.difficulty,
+      imageUrl: recipe.imageUrl ?? '',
+      ingredients: recipe.ingredients.join('\n'),
+      steps: recipe.steps.join('\n'),
+    });
+  }
 
   protected submit(): void {
     if (this.recipeForm.invalid) {
