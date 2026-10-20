@@ -1,20 +1,29 @@
-import { DestroyRef, Service, inject, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import {
-  User,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  User,
 } from 'firebase/auth';
 import { auth } from '../../firebase.config';
 
 @Service()
 export class AuthService {
   readonly currentUser = signal<User | null>(null);
-  private readonly destroyRef = inject(DestroyRef);
+  readonly loading = signal<boolean>(true);
+  readonly isLoggedIn = computed<boolean>(() => !!this.currentUser());
+  readonly destroyRef = inject(DestroyRef);
 
-  constructor() {
-    const unsubscribe = onAuthStateChanged(auth, (user) => this.currentUser.set(user));
-    this.destroyRef.onDestroy(unsubscribe);
+  initAuth(): Promise<void> {
+    return new Promise((resolve) => {
+      const stateChange = onAuthStateChanged(auth, (user) => {
+        this.currentUser.set(user);
+        this.loading.set(false);
+        resolve();
+      });
+
+      this.destroyRef.onDestroy(stateChange);
+    });
   }
 
   signIn(email: string, password: string) {

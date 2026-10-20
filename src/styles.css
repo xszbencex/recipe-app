@@ -1,2 +1,60 @@
-@import "tailwindcss";
-@plugin "daisyui";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
+@import 'tailwindcss';
+@plugin "daisyui" {
+  themes: recipe --default;
+}
+
+@plugin "daisyui/theme" {
+  name: recipe;
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #faf9f5;
+  --color-base-200: #f5f3ed;
+  --color-base-300: #deddd5;
+  --color-base-content: #29332d;
+  --color-primary: #244c36;
+  --color-primary-content: #ffffff;
+  --color-secondary: #a46e49;
+  --color-secondary-content: #ffffff;
+  --color-accent: #b8875c;
+  --color-accent-content: #1f3026;
+  --color-neutral: #29332d;
+  --color-neutral-content: #ffffff;
+  --color-info: #39758a;
+  --color-info-content: #ffffff;
+  --color-success: #43604e;
+  --color-success-content: #ffffff;
+  --color-warning: #8a6640;
+  --color-warning-content: #ffffff;
+  --color-error: #a94e40;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.625rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+
+  --color-ink: #1f3026;
+  --color-muted: #777d76;
+  --color-earth: #a46e49;
+  --color-line: #dcdbd4;
+  --color-line-faint: #ebe9e3;
+
+  --shadow-recipe-card: 0 8px 30px rgb(47 48 40 / 4%);
+  --shadow-recipe-card-hover: 0 13px 34px rgb(47 48 40 / 9%);
+}
+
+body {
+  margin: 0;
+  @apply min-h-screen min-w-80 bg-base-200 font-sans text-base-content;
+}

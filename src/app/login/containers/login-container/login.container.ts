@@ -1,15 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
-  templateUrl: './login.component.html',
+  templateUrl: './login.container.html',
 })
 export class LoginComponent {
   protected readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly loginForm = new FormGroup({
@@ -35,6 +37,7 @@ export class LoginComponent {
 
     try {
       await this.auth.signIn(email, password);
+      await this.router.navigateByUrl('/dashboard');
     } catch (error: unknown) {
       this.errorMessage.set(this.getErrorMessage(error));
     } finally {

@@ -1,0 +1,65 @@
+<app-dashboard-header
+  [email]="auth.currentUser()?.email ?? null"
+  [displayName]="auth.currentUser()?.displayName ?? null"
+  (createRecipe)="isCreateOpen.set(true)"
+  (logout)="logout()"
+  (searchChange)="searchTerm.set($event)"
+/>
+
+<main class="mx-auto w-full max-w-7xl px-4 pt-14 pb-16 sm:px-6 lg:px-8 max-md:pt-10">
+  <section
+    class="flex items-end justify-between gap-6 max-sm:items-start"
+    aria-labelledby="page-title"
+  >
+    <div>
+      <p class="mb-2 text-xs font-bold tracking-widest text-earth">
+        A TE KONYHAI ARCHÍVUMOD
+      </p>
+      <h1
+        id="page-title"
+        class="m-0 font-serif text-5xl leading-tight font-normal text-ink max-sm:text-4xl"
+      >
+        Receptjeim
+      </h1>
+      <p class="mt-2 mb-0 text-sm text-muted max-sm:max-w-prose">
+        Egy helyen azok az ételek, amiket újra és újra elkészítenél.
+      </p>
+    </div>
+    <div
+      class="flex items-baseline gap-2 border-b border-base-300 pb-2 text-base-content/70 max-sm:hidden"
+      aria-live="polite"
+    >
+      <span class="font-serif text-3xl text-earth">{{ recipes().length }}</span>
+      <small class="text-xs uppercase">elmentett recept</small>
+    </div>
+  </section>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error mt-6" role="alert">
+      <span>{{ errorMessage() }}</span>
+      <button class="btn btn-sm btn-ghost" type="button" (click)="loadRecipes()">Újra</button>
+    </div>
+  }
+
+  <app-recipe-collection
+    [recipes]="filteredRecipes()"
+    [totalRecipes]="recipes().length"
+    [categories]="categories()"
+    [selectedCategory]="selectedCategory()"
+    [selectedDifficulty]="selectedDifficulty()"
+    [isLoading]="isLoading()"
+    (categoryChange)="selectedCategory.set($event)"
+    (difficultyChange)="selectedDifficulty.set($event)"
+    (clearFilters)="clearFilters()"
+    (createRecipe)="isCreateOpen.set(true)"
+  />
+</main>
+
+@if (isCreateOpen()) {
+  <app-recipe-form-dialog
+    [isSaving]="isSaving()"
+    [errorMessage]="errorMessage()"
+    (dismiss)="closeCreateForm()"
+    (save)="saveRecipe($event)"
+  />
+}

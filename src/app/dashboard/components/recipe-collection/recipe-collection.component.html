@@ -1,0 +1,126 @@
+<section
+  class="mt-10 mb-6 flex items-center justify-between gap-4 border-b border-line max-sm:items-end max-sm:gap-2"
+  aria-label="Receptszűrők"
+>
+  <div
+    class="tabs tabs-border max-w-full overflow-x-auto whitespace-nowrap max-sm:flex-1"
+    role="tablist"
+    aria-label="Szűrés kategória szerint"
+  >
+    @for (category of categories(); track category) {
+      <button
+        class="tab"
+        [class.tab-active]="selectedCategory() === category"
+        [class.text-primary]="selectedCategory() === category"
+        [attr.aria-selected]="selectedCategory() === category"
+        role="tab"
+        type="button"
+        (click)="categoryChange.emit(category)"
+      >
+        {{ category }}
+      </button>
+    }
+  </div>
+  <select
+    class="select select-bordered mb-2 w-auto border-0 bg-transparent text-xs text-base-content/70 max-sm:max-w-32 max-sm:px-2"
+    aria-label="Szűrés nehézség szerint"
+    [value]="selectedDifficulty()"
+    (change)="onDifficultyChange($event)"
+  >
+    <option value="Mind">Minden nehézség</option>
+    <option value="easy">Könnyű</option>
+    <option value="medium">Közepes</option>
+    <option value="hard">Haladó</option>
+  </select>
+</section>
+
+@if (isLoading()) {
+  <div class="grid justify-items-center gap-3 px-5 py-24 text-center text-muted" role="status">
+    <span class="loading loading-spinner loading-md" aria-hidden="true"></span>
+    <span>Receptek betöltése...</span>
+  </div>
+} @else if (recipes().length) {
+  <section
+    class="grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2 xl:grid-cols-3"
+    aria-label="Receptek"
+  >
+    @for (recipe of recipes(); track recipe.id; let index = $index) {
+      <article
+        class="card card-border overflow-hidden rounded-box border-base-300 bg-base-100/80 shadow-recipe-card transition-all duration-200 hover:-translate-y-1 hover:shadow-recipe-card-hover"
+      >
+        <figure class="relative m-0 grid h-52 place-items-center overflow-hidden bg-base-300">
+          @if (recipe.imageUrl) {
+            <img class="h-full w-full object-cover" [src]="recipe.imageUrl" [alt]="recipe.title" loading="lazy" />
+          } @else {
+            <span
+              class="grid size-full place-items-center bg-linear-to-br from-base-300 to-base-200 font-serif text-6xl text-base-content/60"
+              aria-hidden="true"
+            >
+              {{ recipe.title.slice(0, 1).toUpperCase() }}
+            </span>
+          }
+          <span
+            class="absolute right-3 bottom-2 font-serif text-2xl text-white drop-shadow-md"
+            >{{ (index + 1).toString().padStart(2, '0') }}</span
+          >
+        </figure>
+        <div class="card-body gap-2 px-5 pt-5 pb-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold tracking-wider text-earth uppercase">{{
+              recipe.category
+            }}</span>
+            <span
+              class="badge badge-soft"
+              [class.badge-success]="recipe.difficulty === 'easy'"
+              [class.badge-warning]="recipe.difficulty === 'medium'"
+              [class.badge-error]="recipe.difficulty === 'hard'"
+            >
+              {{ difficultyLabel(recipe.difficulty) }}
+            </span>
+          </div>
+          <h2 class="card-title font-serif text-2xl leading-tight font-normal text-ink">
+            {{ recipe.title }}
+          </h2>
+          <p class="m-0 min-h-10 text-xs leading-relaxed text-muted">{{ recipe.description }}</p>
+          <div
+            class="mt-2 flex justify-between gap-2 border-t border-line-faint pt-3 text-xs text-base-content/60"
+          >
+            <span>{{ recipe.ingredients.length }} hozzávaló · {{ recipe.steps.length }} lépés</span>
+            @if (recipe.createdAt; as createdAt) {
+              <time>{{ createdAt.toDate() | date: 'yyyy. MMM d.' }}</time>
+            }
+          </div>
+        </div>
+      </article>
+    }
+  </section>
+} @else {
+  <section
+    class="grid justify-items-center gap-3 rounded-xl border border-dashed border-base-300 px-5 py-16 text-center text-muted"
+  >
+    <span
+      class="grid size-12 place-items-center rounded-full bg-success/15 text-2xl text-success"
+      aria-hidden="true"
+      >＋</span
+    >
+    <h2 class="m-0 font-serif text-2xl font-normal text-ink">
+      {{ totalRecipes() ? 'Nincs találat' : 'Kezdjük a gyűjteményedet' }}
+    </h2>
+    <p class="m-0 mb-1 text-sm">
+      {{
+        totalRecipes()
+          ? 'Próbálj más keresést vagy szűrőt.'
+          : 'Mentsd el az első receptet, amit szívesen újra elkészítenél.'
+      }}
+    </p>
+    @if (totalRecipes()) {
+      <button class="btn btn-outline" type="button" (click)="clearFilters.emit()">
+        Szűrők törlése
+      </button>
+    } @else {
+      <button class="btn btn-primary" type="button" (click)="createRecipe.emit()">
+        Első recept hozzáadása
+      </button>
+    }
+  </section>
+}

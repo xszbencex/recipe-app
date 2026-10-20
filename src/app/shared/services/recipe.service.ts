@@ -1,4 +1,4 @@
-import { Service } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   QueryConstraint,
   addDoc,
@@ -11,7 +11,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { db } from '../../firebase.config';
+import { auth, db } from '../../firebase.config';
 import { Recipe } from '../models/recipe.model';
 
 export interface RecipeFilters {
@@ -20,10 +20,17 @@ export interface RecipeFilters {
   name?: string;
 }
 
-@Service()
+@Injectable({
+  providedIn: 'root',
+})
 export class RecipeService {
   async getRecipes(filters: RecipeFilters = {}): Promise<Recipe[]> {
-    const constraints: QueryConstraint[] = [];
+    const user = auth.currentUser;
+    if (!user) {
+      return [];
+    }
+
+    const constraints: QueryConstraint[] = [where('authorId', '==', user.uid)];
 
     if (filters.category) {
       constraints.push(where('category', '==', filters.category));
@@ -52,8 +59,14 @@ export class RecipeService {
   }
 
   async addRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<string> {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('Csak bejelentkezett felhasználó hozhat létre receptet!');
+    }
+
     const recipeRef = await addDoc(collection(db, 'recipes'), {
       ...recipe,
+      authorId: user.uid,
       createdAt: serverTimestamp(),
     });
 
