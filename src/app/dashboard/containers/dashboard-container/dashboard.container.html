@@ -1,9 +1,7 @@
 <app-dashboard-header
   [email]="auth.currentUser()?.email ?? null"
   [displayName]="auth.currentUser()?.displayName ?? null"
-  (createRecipe)="isCreateOpen.set(true)"
   (logout)="logout()"
-  (searchChange)="searchTerm.set($event)"
 />
 
 <main class="mx-auto w-full max-w-7xl px-4 pt-14 pb-16 sm:px-6 lg:px-8 max-md:pt-10">
@@ -32,6 +30,55 @@
       <span class="font-serif text-3xl text-earth">{{ recipes().length }}</span>
       <small class="text-xs uppercase">elmentett recept</small>
     </div>
+  </section>
+
+  <section
+    class="mt-8 flex items-center justify-between gap-4 max-sm:flex-col max-sm:items-stretch"
+    aria-label="Receptkeresés és hozzáadás"
+  >
+    <label class="input input-bordered w-full max-w-[560px] bg-base-100 max-sm:max-w-none">
+      <svg
+        class="size-4 shrink-0 text-base-content/50"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4-4" />
+      </svg>
+      <input
+        class="min-w-0"
+        aria-label="Receptek keresése"
+        type="search"
+        placeholder="Keress recept, hozzávaló vagy kategória szerint..."
+        [value]="searchTerm()"
+        (input)="onSearchInput($event)"
+      />
+    </label>
+    <button
+      class="btn btn-primary gap-2 px-5 shadow-md max-sm:w-full"
+      type="button"
+      (click)="isCreateOpen.set(true)"
+    >
+      <svg
+        class="size-4"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Recept hozzáadása
+    </button>
   </section>
 
   @if (errorMessage()) {

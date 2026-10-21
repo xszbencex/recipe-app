@@ -1,5 +1,5 @@
 <section
-  class="mt-10 mb-6 flex items-center justify-between gap-4 border-b border-line max-sm:items-end max-sm:gap-2"
+  class="mt-7 mb-6 flex items-end justify-between gap-4 border-b border-line max-sm:gap-2"
   aria-label="Receptszűrők"
 >
   <div
@@ -22,7 +22,7 @@
     }
   </div>
   <select
-    class="select select-bordered mb-2 w-auto border-0 bg-transparent text-xs text-base-content/70 max-sm:max-w-32 max-sm:px-2"
+    class="select w-auto border-0 shadow-none text-xs text-base-content/70 bg-base-200"
     aria-label="Szűrés nehézség szerint"
     [value]="selectedDifficulty()"
     (change)="onDifficultyChange($event)"
@@ -50,9 +50,14 @@
         [routerLink]="['/recipes', recipe.id]"
         [attr.aria-label]="'Recept megtekintése: ' + recipe.title"
       >
-        <figure class="relative m-0 grid h-52 place-items-center overflow-hidden bg-base-300">
+        <figure class="relative m-0 flex h-52 place-items-center overflow-hidden bg-base-300">
           @if (recipe.imageUrl) {
-            <img class="h-full w-full object-cover" [src]="recipe.imageUrl" [alt]="recipe.title" loading="lazy" />
+            <img
+              class="h-full w-full object-cover"
+              [src]="recipe.imageUrl"
+              [alt]="recipe.title"
+              loading="lazy"
+            />
           } @else {
             <span
               class="grid size-full place-items-center bg-linear-to-br from-base-300 to-base-200 font-serif text-6xl text-base-content/60"
@@ -62,24 +67,21 @@
             </span>
           }
           <span
-            class="absolute right-3 bottom-2 font-serif text-2xl text-white drop-shadow-md"
-            >{{ (index + 1).toString().padStart(2, '0') }}</span
+            class="badge absolute top-3 left-3 z-10 border border-white/30 text-[10px] font-bold tracking-wider uppercase shadow-sm backdrop-blur-sm"
+            [class.badge-success]="recipe.difficulty === 'easy'"
+            [class.badge-warning]="recipe.difficulty === 'medium'"
+            [class.badge-error]="recipe.difficulty === 'hard'"
           >
+            {{ difficultyLabel(recipe.difficulty) }}
+          </span>
+          <span class="absolute right-3 bottom-2 font-serif text-2xl text-white drop-shadow-md">{{
+            (index + 1).toString().padStart(2, '0')
+          }}</span>
         </figure>
         <div class="card-body gap-2 px-5 pt-5 pb-4">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold tracking-wider text-earth uppercase">{{
-              recipe.category
-            }}</span>
-            <span
-              class="badge badge-soft"
-              [class.badge-success]="recipe.difficulty === 'easy'"
-              [class.badge-warning]="recipe.difficulty === 'medium'"
-              [class.badge-error]="recipe.difficulty === 'hard'"
-            >
-              {{ difficultyLabel(recipe.difficulty) }}
-            </span>
-          </div>
+          <span class="text-xs font-bold tracking-wider text-earth uppercase">{{
+            recipe.category
+          }}</span>
           <h2 class="card-title font-serif text-2xl leading-tight font-normal text-ink">
             {{ recipe.title }}
           </h2>

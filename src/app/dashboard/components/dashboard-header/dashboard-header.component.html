@@ -1,71 +1,77 @@
-<header class="sticky top-0 z-5 border-b border-base-300 bg-base-200/95 backdrop-blur">
-  <div
-    class="navbar mx-auto min-h-20 w-full max-w-7xl gap-6 px-4 sm:px-6 lg:px-8 max-md:flex-wrap max-md:gap-3 max-md:py-3"
-  >
-    <div class="navbar-start max-md:flex-1"></div>
-    <div class="navbar-center flex-1 max-md:order-3 max-md:w-full">
-      <label class="input input-bordered mx-auto w-full max-w-sm bg-base-100">
-        <svg
-          class="size-4 shrink-0 text-base-content/60"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="none"
+<header class="sticky top-0 z-20 border-b border-base-300/80 bg-base-200/90 backdrop-blur-lg">
+  <nav class="navbar mx-auto min-h-[74px] max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Fő navigáció">
+    <div class="navbar-start">
+      <a
+        class="inline-flex items-center gap-2.5 font-serif text-2xl tracking-tight text-ink no-underline"
+        routerLink="/"
+      >
+        <span
+          class="grid size-9 place-items-center rounded-full bg-primary text-primary-content"
           aria-hidden="true"
         >
-          <circle cx="6.5" cy="6.5" r="5.25" stroke="currentColor" stroke-width="1.5" />
-          <path d="m10.5 10.5 4 4" stroke="currentColor" stroke-width="1.5" />
-        </svg>
-        <input
-          class="w-full min-w-0"
-          aria-label="Receptek keresése"
-          type="search"
-          placeholder="Keress a receptjeid között..."
-          (input)="onSearchInput($event)"
-        />
-        <kbd class="kbd kbd-sm text-base-content/60 max-md:hidden">/</kbd>
-      </label>
-    </div>
-    <div class="navbar-end gap-4 max-md:flex-1 max-md:justify-end">
-      <button class="btn btn-primary" type="button" (click)="createRecipe.emit()">
-        <span aria-hidden="true">+</span>
-        Új recept
-      </button>
-      @if (email() || displayName()) {
-        <span
-          class="inline-flex items-center gap-2 border-0 bg-transparent text-xs font-semibold text-base-content/80"
-          type="button"
-        >
-          <span
-            class="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-content"
+          <svg
+            class="size-[18px]"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            {{ (displayName() || email() || 'S').slice(0, 1).toUpperCase() }}
-          </span>
-          <span class="max-md:hidden">{{ displayName() || email() }}</span>
+            <path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H20v17H7.5A2.5 2.5 0 0 0 5 21.5z" />
+            <path d="M5 4.5v17" />
+            <path d="M12.5 2v17" />
+          </svg>
         </span>
+        Receptfüzet
+      </a>
+    </div>
+    <div class="navbar-end gap-4 max-sm:gap-2">
+      @if (email() || displayName()) {
+        <div class="flex items-center gap-2.5">
+          <span
+            class="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-accent-content"
+            aria-hidden="true"
+          >
+            {{ profileInitials() }}
+          </span>
+          <span class="hidden min-w-0 sm:block">
+            <span class="block truncate text-xs font-bold text-base-content/90">
+              {{ displayName() || email() }}
+            </span>
+            @if (displayName() && email()) {
+              <span class="mt-0.5 block truncate text-[10px] text-base-content/60">
+                {{ email() }}
+              </span>
+            }
+          </span>
+        </div>
+        <span class="h-7 w-px bg-base-300 max-sm:hidden" aria-hidden="true"></span>
       }
       <button
-        class="btn btn-ghost btn-square"
+        class="btn btn-ghost btn-sm gap-2 px-2 text-base-content/70 hover:text-error"
         type="button"
-        aria-label="Kijelentkezés"
         (click)="logout.emit()"
       >
         <svg
+          class="size-4"
           xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="lucide lucide-log-out preview-icon"
+          aria-hidden="true"
         >
-          <path d="m16 17 5-5-5-5" />
-          <path d="M21 12H9" />
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <path d="M10 17l5-5-5-5" />
+          <path d="M15 12H3" />
+          <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" />
         </svg>
+        <span class="max-sm:hidden">Kijelentkezés</span>
+        <span class="sr-only sm:hidden">Kijelentkezés</span>
       </button>
     </div>
-  </div>
+  </nav>
 </header>

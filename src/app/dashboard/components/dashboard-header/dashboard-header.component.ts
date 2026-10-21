@@ -9,11 +9,20 @@ import { RouterLink } from '@angular/router';
 export class DashboardHeaderComponent {
   readonly email = input<string | null>(null);
   readonly displayName = input<string | null>(null);
-  readonly createRecipe = output<void>();
   readonly logout = output<void>();
-  readonly searchChange = output<string>();
 
-  protected onSearchInput(event: Event): void {
-    this.searchChange.emit((event.target as HTMLInputElement).value);
+  protected profileInitials(): string {
+    const name = this.displayName()?.trim();
+
+    if (name) {
+      return name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase();
+    }
+
+    return this.email()?.slice(0, 1).toUpperCase() ?? 'R';
   }
 }

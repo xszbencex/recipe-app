@@ -1,12 +1,16 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [NgOptimizedImage, ReactiveFormsModule, RouterLink],
+  host: {
+    class: 'block min-h-screen bg-base-200 font-sans text-base-content',
+  },
   templateUrl: './login.container.html',
 })
 export class LoginComponent {
