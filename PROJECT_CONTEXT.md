@@ -14,28 +14,7 @@ Egy modern, letisztult, editorial/magazin stílusú személyes receptkezelő web
 - **AI / OCR:** Google Gemini API (Gemini Flash Vision) – Képből strukturált JSON recept generálása ingyenes tier-en
 - **Hoszting:** Vercel (Hobby csomag)
 
-## 3. Adatmodell & Firestore Strukturálás
-
-### Collection: `recipes`
-
-Minden recept a `recipes` gyűjteményben tárolódik önálló dokumentumként.
-
-```typescript
-export interface Recipe {
-  id?: string;
-  authorId: string; // Firebase Auth UID (tulajdonos)
-  title: string;
-  description: string;
-  category: string; // Pl. "Vacsora", "Ebéd", "Desszert"
-  difficulty: 'easy' | 'medium' | 'hard';
-  imageUrl: string;
-  ingredients: string[];
-  steps: string[];
-  createdAt: Timestamp;
-}
-```
-
-## 4. Biztonság & Firebase Security Rules
+## 3. Biztonság & Firebase Security Rules
 
 A Firestore biztonsági szabályai biztosítják, hogy minden felhasználó kizárólag a saját adataihoz férhessen hozzá:
 
@@ -52,7 +31,7 @@ service cloud.firestore {
 }
 ```
 
-## 5. Alkalmazás Inicializálás & Auth Kezelés
+## 4. Alkalmazás Inicializálás & Auth Kezelés
 
 - **`APP_INITIALIZER`:** Az Angular alkalmazás indulásakor az `APP_INITIALIZER` segítségével megvárjuk a Firebase Auth inicializálódását (`onAuthStateChanged`). Így a lap frissítésekor sincs üres vagy hiányos állapot.
 - **`AuthService`:** Signals segítségével tárolja a `currentUser` és `loading` állapotot.
@@ -60,7 +39,7 @@ service cloud.firestore {
   - Minden lekérdezés tartalmazza a `where('authorId', '==', user.uid)` szűrőt a Security Rules elvárásainak megfelelően.
   - Saját kereső- és szűrőlogikát tartalmaz (kategória, nehézség, név szerinti keresés).
 
-## 6. Jövőbeli / Tervezett Funkciók
+## 5. Jövőbeli / Tervezett Funkciók
 
 1.  **AI OCR Recept Import:** Kép feltöltése -> Gemini Vision API -> Automatikus JSON válasz -> Új recept form előkitöltése.
 2.  **Recept Kártya & Részletek:** Részletes recept nézet, hozzávalók és lépések interaktív pipálásával.

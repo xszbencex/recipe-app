@@ -1,6 +1,16 @@
-import { Component, OnInit, input, output } from '@angular/core';
+import { Component, input, OnInit, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Recipe } from '../../../shared/models/recipe.model';
+import {
+  CATEGORY_TRANSLATION_MAP,
+  DIFFICULTY_TRANSLATION_MAP,
+} from '../../constants/translations.constants';
+import {
+  Recipe,
+  RECIPE_CATEGORIES,
+  RECIPE_DIFFICULTIES,
+  RecipeCategory,
+  RecipeDifficulty,
+} from '../../models/recipe.model';
 
 @Component({
   selector: 'app-recipe-form-dialog',
@@ -14,11 +24,19 @@ export class RecipeFormDialogComponent implements OnInit {
   readonly dismiss = output<void>();
   readonly save = output<Omit<Recipe, 'id' | 'createdAt'>>();
 
+  readonly recipeDifficulties = RECIPE_DIFFICULTIES;
+  readonly difficultyTranslationMap = DIFFICULTY_TRANSLATION_MAP;
+  readonly recipeCategories = RECIPE_CATEGORIES;
+  readonly categoryTranslationMap = CATEGORY_TRANSLATION_MAP;
+
   protected readonly recipeForm = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    description: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    category: new FormControl('Vacsora', { nonNullable: true, validators: [Validators.required] }),
-    difficulty: new FormControl<Recipe['difficulty']>('easy', { nonNullable: true }),
+    comments: new FormControl('', { nonNullable: true }),
+    category: new FormControl<RecipeCategory>('dinner', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    difficulty: new FormControl<RecipeDifficulty>('easy', { nonNullable: true }),
     imageUrl: new FormControl<string | null>(null),
     ingredients: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     steps: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -32,7 +50,7 @@ export class RecipeFormDialogComponent implements OnInit {
 
     this.recipeForm.patchValue({
       title: recipe.title,
-      description: recipe.description,
+      comments: recipe.comments ?? '',
       category: recipe.category,
       difficulty: recipe.difficulty,
       imageUrl: recipe.imageUrl || null,
@@ -50,7 +68,7 @@ export class RecipeFormDialogComponent implements OnInit {
     const value = this.recipeForm.getRawValue();
     this.save.emit({
       title: value.title.trim(),
-      description: value.description.trim(),
+      comments: value.comments.trim(),
       category: value.category,
       difficulty: value.difficulty,
       imageUrl: value.imageUrl ? value.imageUrl.trim() : null,

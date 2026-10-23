@@ -1,13 +1,15 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RecipeDeleteDialogComponent } from '../../../shared/components/recipe-delete-dialog/recipe-delete-dialog.component';
+import { RecipeFormDialogComponent } from '../../../shared/components/recipe-form-dialog/recipe-form-dialog.component';
+import { RECIPE_ID_ROUTE_PARAM } from '../../../shared/constants/router.constants';
+import { DIFFICULTY_TRANSLATION_MAP } from '../../../shared/constants/translations.constants';
 import { Recipe } from '../../../shared/models/recipe.model';
 import { RecipeService } from '../../../shared/services/recipe.service';
-import { RecipeFormDialogComponent } from '../../components/recipe-form-dialog/recipe-form-dialog.component';
 
 @Component({
-  selector: 'app-recipe-detail-container',
-  imports: [DatePipe, RouterLink, RecipeFormDialogComponent],
+  imports: [DatePipe, RouterLink, RecipeDeleteDialogComponent, RecipeFormDialogComponent],
   host: {
     class: 'block min-h-screen bg-base-200 font-sans text-base-content',
   },
@@ -20,6 +22,7 @@ export class RecipeDetailContainerComponent implements OnInit {
   protected readonly isRetryable = signal(false);
   protected readonly recipeId = signal('');
   protected readonly isEditOpen = signal(false);
+  protected readonly isDeleteOpen = signal(false);
   protected readonly isSaving = signal(false);
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
@@ -27,8 +30,10 @@ export class RecipeDetailContainerComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly recipeService = inject(RecipeService);
 
+  readonly difficultyTranslationMap = DIFFICULTY_TRANSLATION_MAP;
+
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get(RECIPE_ID_ROUTE_PARAM);
     if (!id) {
       this.isLoading.set(false);
       this.errorMessage.set('Ez a recept nem található.');
@@ -53,15 +58,13 @@ export class RecipeDetailContainerComponent implements OnInit {
 
       this.recipe.set(recipe);
     } catch {
-      this.errorMessage.set('A recept betöltése nem sikerült. Ellenőrizd a kapcsolatot, majd próbáld újra.');
+      this.errorMessage.set(
+        'A recept betöltése nem sikerült. Ellenőrizd a kapcsolatot, majd próbáld újra.',
+      );
       this.isRetryable.set(true);
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  protected difficultyLabel(difficulty: Recipe['difficulty']): string {
-    return { easy: 'Könnyű', medium: 'Közepes', hard: 'Haladó' }[difficulty];
   }
 
   protected openEditForm(): void {
@@ -93,29 +96,18 @@ export class RecipeDetailContainerComponent implements OnInit {
     this.errorMessage.set(null);
   }
 
-  protected openDeleteConfirmation(dialog: HTMLDialogElement): void {
+  protected openDeleteConfirmation(): void {
     this.deleteError.set(null);
-    dialog.showModal();
+    this.isDeleteOpen.set(true);
   }
 
-  protected onDeleteDialogCancel(event: Event): void {
-    if (this.isDeleting()) {
-      event.preventDefault();
-    }
-  }
-
-  protected onDeleteDialogClose(): void {
-    if (!this.isDeleting()) {
-      this.deleteError.set(null);
-    }
-  }
-
-  protected closeDeleteConfirmation(dialog: HTMLDialogElement): void {
+  protected closeDeleteConfirmation(): void {
     if (this.isDeleting()) {
       return;
     }
 
-    dialog.close();
+    this.isDeleteOpen.set(false);
+    this.deleteError.set(null);
   }
 
   protected async deleteRecipe(): Promise<void> {
@@ -128,6 +120,7 @@ export class RecipeDetailContainerComponent implements OnInit {
     this.deleteError.set(null);
     try {
       await this.recipeService.deleteRecipe(recipe.id);
+      this.isDeleteOpen.set(false);
       await this.router.navigateByUrl('/');
     } catch {
       this.deleteError.set('A recept törlése nem sikerült. Próbáld újra.');

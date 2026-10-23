@@ -10,9 +10,7 @@
     aria-labelledby="page-title"
   >
     <div>
-      <p class="mb-2 text-xs font-bold tracking-widest text-earth">
-        A TE KONYHAI ARCHÍVUMOD
-      </p>
+      <p class="mb-2 text-xs font-bold tracking-widest text-earth">A TE KONYHAI ARCHÍVUMOD</p>
       <h1
         id="page-title"
         class="m-0 font-serif text-5xl leading-tight font-normal text-ink max-sm:text-4xl"
@@ -23,89 +21,41 @@
         Egy helyen azok az ételek, amiket újra és újra elkészítenél.
       </p>
     </div>
-    <div
-      class="flex items-baseline gap-2 border-b border-base-300 pb-2 text-base-content/70 max-sm:hidden"
-      aria-live="polite"
-    >
-      <span class="font-serif text-3xl text-earth">{{ recipes().length }}</span>
-      <small class="text-xs uppercase">elmentett recept</small>
-    </div>
+    @if (!loadErrorMessage()) {
+      <div
+        class="flex items-baseline gap-2 border-b border-base-300 pb-2 text-base-content/70 max-sm:hidden"
+        aria-live="polite"
+      >
+        <span
+          class="font-serif text-3xl"
+          [ngClass]="{ 'skeleton skeleton-text': isLoading(), 'text-earth': !isLoading() }"
+        >
+          {{ recipes().length }}
+        </span>
+        <small class="text-xs uppercase" [ngClass]="{ 'skeleton skeleton-text': isLoading() }">
+          elmentett recept
+        </small>
+      </div>
+    }
   </section>
 
-  <section
-    class="mt-8 flex items-center justify-between gap-4 max-sm:flex-col max-sm:items-stretch"
-    aria-label="Receptkeresés és hozzáadás"
-  >
-    <label class="input input-bordered w-full max-w-[560px] bg-base-100 max-sm:max-w-none">
-      <svg
-        class="size-4 shrink-0 text-base-content/50"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-4-4" />
-      </svg>
-      <input
-        class="min-w-0"
-        aria-label="Receptek keresése"
-        type="search"
-        placeholder="Keress recept, hozzávaló vagy kategória szerint..."
-        [value]="searchTerm()"
-        (input)="onSearchInput($event)"
-      />
-    </label>
-    <button
-      class="btn btn-primary gap-2 px-5 shadow-md max-sm:w-full"
-      type="button"
-      (click)="isCreateOpen.set(true)"
-    >
-      <svg
-        class="size-4"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-      Recept hozzáadása
-    </button>
-  </section>
-
-  @if (errorMessage()) {
-    <div class="alert alert-error mt-6" role="alert">
-      <span>{{ errorMessage() }}</span>
-      <button class="btn btn-sm btn-ghost" type="button" (click)="loadRecipes()">Újra</button>
-    </div>
-  }
+  <app-recipe-filters [filterForm]="filterForm" (createRecipe)="openCreateForm()" />
 
   <app-recipe-collection
     [recipes]="filteredRecipes()"
     [totalRecipes]="recipes().length"
-    [categories]="categories()"
-    [selectedCategory]="selectedCategory()"
-    [selectedDifficulty]="selectedDifficulty()"
+    [loadError]="loadErrorMessage()"
     [isLoading]="isLoading()"
-    (categoryChange)="selectedCategory.set($event)"
-    (difficultyChange)="selectedDifficulty.set($event)"
+    (retryLoading)="loadRecipes()"
     (clearFilters)="clearFilters()"
-    (createRecipe)="isCreateOpen.set(true)"
+    (createRecipe)="openCreateForm()"
   />
 </main>
 
 @if (isCreateOpen()) {
   <app-recipe-form-dialog
     [isSaving]="isSaving()"
-    [errorMessage]="errorMessage()"
+    [errorMessage]="createErrorMessage()"
     (dismiss)="closeCreateForm()"
     (save)="saveRecipe($event)"
   />

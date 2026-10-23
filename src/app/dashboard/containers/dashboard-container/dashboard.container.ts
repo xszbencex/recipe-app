@@ -1,15 +1,27 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Recipe } from '../../../shared/models/recipe.model';
+import { RecipeFormDialogComponent } from '../../../shared/components/recipe-form-dialog/recipe-form-dialog.component';
+import { Recipe, RecipeCategory, RecipeDifficulty } from '../../../shared/models/recipe.model';
 import { AuthService } from '../../../shared/services/auth.service';
 import { RecipeService } from '../../../shared/services/recipe.service';
 import { DashboardHeaderComponent } from '../../components/dashboard-header/dashboard-header.component';
 import { RecipeCollectionComponent } from '../../components/recipe-collection/recipe-collection.component';
-import { RecipeFormDialogComponent } from '../../components/recipe-form-dialog/recipe-form-dialog.component';
+import {
+  RecipeFilterControls,
+  RecipeFiltersComponent,
+} from '../../components/recipe-filters/recipe-filters.component';
 
 @Component({
-  selector: 'app-dashboard-container',
-  imports: [DashboardHeaderComponent, RecipeCollectionComponent, RecipeFormDialogComponent],
+  imports: [
+    DashboardHeaderComponent,
+    RecipeFiltersComponent,
+    RecipeCollectionComponent,
+    RecipeFormDialogComponent,
+    NgClass,
+  ],
   host: {
     class: 'block min-h-screen bg-base-200 font-sans text-base-content',
   },
@@ -18,53 +30,51 @@ import { RecipeFormDialogComponent } from '../../components/recipe-form-dialog/r
 export class DashboardContainerComponent implements OnInit {
   protected readonly auth = inject(AuthService);
   protected readonly recipes = signal<Recipe[]>([]);
-  protected readonly searchTerm = signal('');
-  protected readonly selectedCategory = signal('Mind');
-  protected readonly selectedDifficulty = signal('Mind');
+  protected readonly filterForm = new FormGroup<RecipeFilterControls>({
+    search: new FormControl('', { nonNullable: true }),
+    category: new FormControl<RecipeCategory | null>(null),
+    difficulty: new FormControl<RecipeDifficulty | null>(null),
+  });
+  private readonly filterValues = signal(this.filterForm.getRawValue());
   protected readonly isLoading = signal(true);
   protected readonly isCreateOpen = signal(false);
   protected readonly isSaving = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly loadErrorMessage = signal<string | null>(null);
+  protected readonly createErrorMessage = signal<string | null>(null);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
 
-  protected readonly categories = computed(() => [
-    'Mind',
-    ...Array.from(new Set(this.recipes().map((recipe) => recipe.category))).sort((a, b) =>
-      a.localeCompare(b, 'hu'),
-    ),
-  ]);
   protected readonly filteredRecipes = computed(() => {
-    const search = this.searchTerm().trim().toLocaleLowerCase('hu');
+    const filters = this.filterValues();
+    const search = filters.search.trim().toLocaleLowerCase('hu');
 
     return this.recipes().filter((recipe) => {
-      const matchesSearch = `${recipe.title} ${recipe.description} ${recipe.category}`
+      const matchesSearch = `${recipe.title} ${recipe.comments ?? ''} ${recipe.category}`
         .toLocaleLowerCase('hu')
         .includes(search);
-      const matchesCategory =
-        this.selectedCategory() === 'Mind' || recipe.category === this.selectedCategory();
+      const matchesCategory = filters.category === null || recipe.category === filters.category;
       const matchesDifficulty =
-        this.selectedDifficulty() === 'Mind' || recipe.difficulty === this.selectedDifficulty();
+        filters.difficulty === null || recipe.difficulty === filters.difficulty;
 
       return matchesSearch && matchesCategory && matchesDifficulty;
     });
   });
   ngOnInit(): void {
+    this.filterForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.filterValues.set(this.filterForm.getRawValue()));
     void this.loadRecipes();
-  }
-
-  protected onSearchInput(event: Event): void {
-    this.searchTerm.set((event.target as HTMLInputElement).value);
   }
 
   protected async loadRecipes(): Promise<void> {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.loadErrorMessage.set(null);
 
     try {
       this.recipes.set(await this.recipeService.getRecipes());
     } catch {
-      this.errorMessage.set(
+      this.loadErrorMessage.set(
         'A receptek betöltése nem sikerült. Ellenőrizd a kapcsolatot, majd próbáld újra.',
       );
     } finally {
@@ -74,14 +84,14 @@ export class DashboardContainerComponent implements OnInit {
 
   protected async saveRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<void> {
     this.isSaving.set(true);
-    this.errorMessage.set(null);
+    this.createErrorMessage.set(null);
 
     try {
       await this.recipeService.addRecipe(recipe);
       this.closeCreateForm();
       await this.loadRecipes();
     } catch {
-      this.errorMessage.set('A recept mentése nem sikerült. Próbáld újra.');
+      this.createErrorMessage.set('A recept mentése nem sikerült. Próbáld újra.');
     } finally {
       this.isSaving.set(false);
     }
@@ -89,13 +99,16 @@ export class DashboardContainerComponent implements OnInit {
 
   protected closeCreateForm(): void {
     this.isCreateOpen.set(false);
-    this.errorMessage.set(null);
+    this.createErrorMessage.set(null);
+  }
+
+  protected openCreateForm(): void {
+    this.createErrorMessage.set(null);
+    this.isCreateOpen.set(true);
   }
 
   protected clearFilters(): void {
-    this.searchTerm.set('');
-    this.selectedCategory.set('Mind');
-    this.selectedDifficulty.set('Mind');
+    this.filterForm.reset({ search: '', category: null, difficulty: null });
   }
 
   protected async logout(): Promise<void> {

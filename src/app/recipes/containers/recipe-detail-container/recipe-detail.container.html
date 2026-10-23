@@ -25,7 +25,9 @@
           {{ recipe.title.slice(0, 1).toUpperCase() }}
         </div>
       }
-      <div class="absolute inset-0 -z-10 bg-linear-to-t from-black/75 via-black/25 to-black/10"></div>
+      <div
+        class="absolute inset-0 -z-10 bg-linear-to-t from-black/75 via-black/25 to-black/10"
+      ></div>
 
       <a
         class="btn btn-square btn-ghost absolute top-4 left-4 border border-white/50 bg-base-100/90 text-base-content shadow-sm sm:top-6 sm:left-6"
@@ -49,7 +51,7 @@
 
       <div class="mx-auto w-full max-w-6xl px-5 pt-24 pb-8 sm:px-8 sm:pb-10 lg:px-10">
         <p class="mb-3 text-xs font-bold tracking-[0.18em] text-white/90 uppercase">
-          {{ recipe.category }} · {{ difficultyLabel(recipe.difficulty) }}
+          {{ recipe.category }} · {{ difficultyTranslationMap[recipe.difficulty] }}
         </p>
         <h1
           id="recipe-title"
@@ -61,11 +63,9 @@
     </section>
 
     <div class="mx-auto max-w-6xl px-5 pt-7 pb-10 sm:px-8 sm:pt-9 sm:pb-14 lg:px-10">
-      <p class="mb-8 max-w-3xl text-base leading-relaxed text-base-content/70 sm:mb-10 sm:text-lg">
-        {{ recipe.description }}
-      </p>
-
-      <div class="grid grid-cols-1 gap-10 sm:gap-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.5fr)] md:gap-14">
+      <div
+        class="grid grid-cols-1 gap-10 sm:gap-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.5fr)] md:gap-14"
+      >
         <section aria-labelledby="ingredients-heading">
           <h2
             id="ingredients-heading"
@@ -77,7 +77,10 @@
             <ul class="m-0 grid list-none gap-3 p-0">
               @for (ingredient of recipe.ingredients; track $index) {
                 <li class="flex items-start gap-3 leading-relaxed text-base-content/80">
-                  <span class="mt-2 size-2 shrink-0 rounded-full bg-earth" aria-hidden="true"></span>
+                  <span
+                    class="mt-2 size-2 shrink-0 rounded-full bg-earth"
+                    aria-hidden="true"
+                  ></span>
                   <span>{{ ingredient }}</span>
                 </li>
               }
@@ -113,19 +116,23 @@
           }
         </section>
       </div>
-
-      @if (recipe.createdAt; as createdAt) {
-        <div class="mt-10 border-t border-base-300 pt-4 text-sm text-base-content/60 sm:mt-12">
-          Elmentve:
-          <time>{{ createdAt.toDate() | date: 'yyyy. MMM d.' }}</time>
-        </div>
-      }
-
-      <div class="mt-8 flex flex-col-reverse gap-3 border-t border-base-300 pt-5 sm:mt-10 sm:flex-row sm:justify-end">
+      <div class="mt-10 border-t border-base-300 pt-4 text-sm text-base-content/60 sm:mt-12">
+        @if (recipe.comments) {
+          <p>Megjegyzés: {{ recipe.comments }}</p>
+        }
+      </div>
+      <div
+        class="mt-8 flex flex-col-reverse gap-3 items-center border-t border-base-300 pt-5 sm:mt-10 sm:flex-row sm:justify-end"
+      >
+        @if (recipe.createdAt; as createdAt) {
+          <span class="text-sm text-base-content/60 mr-auto">
+            Elmentve: <time>{{ createdAt.toDate() | date: 'yyyy. MMM d.' }}</time>
+          </span>
+        }
         <button
           class="btn btn-outline btn-error w-full sm:w-auto"
           type="button"
-          (click)="openDeleteConfirmation(deleteDialog)"
+          (click)="openDeleteConfirmation()"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -147,11 +154,7 @@
           </svg>
           Törlés
         </button>
-        <button
-          class="btn btn-primary w-full sm:w-auto"
-          type="button"
-          (click)="openEditForm()"
-        >
+        <button class="btn btn-primary w-full sm:w-auto" type="button" (click)="openEditForm()">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -176,7 +179,10 @@
   </main>
 } @else {
   <main class="grid min-h-screen place-items-center px-4 py-16">
-    <section class="grid max-w-md justify-items-center gap-4 text-center" aria-labelledby="recipe-error-title">
+    <section
+      class="grid max-w-md justify-items-center gap-4 text-center"
+      aria-labelledby="recipe-error-title"
+    >
       <h1 id="recipe-error-title" class="m-0 font-serif text-3xl font-normal text-ink">
         {{ errorMessage() }}
       </h1>
@@ -184,9 +190,7 @@
         Lehet, hogy a receptet törölték, vagy már nem érhető el a fiókodból.
       </p>
       @if (isRetryable()) {
-        <button class="btn" type="button" (click)="loadRecipe(recipeId())">
-          Újrapróbálás
-        </button>
+        <button class="btn" type="button" (click)="loadRecipe(recipeId())">Újrapróbálás</button>
       }
       <a class="btn btn-ghost" routerLink="/">Vissza a receptekhez</a>
     </section>
@@ -205,86 +209,13 @@
   }
 }
 
-<dialog
-  #deleteDialog
-  class="modal"
-  aria-labelledby="delete-title"
-  aria-describedby="delete-description"
-  (cancel)="onDeleteDialogCancel($event)"
-  (close)="onDeleteDialogClose()"
->
-    <section class="modal-box max-w-md border border-error/30 bg-base-100">
-      <div class="mb-4 flex items-start gap-4">
-        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-error/10 text-error" aria-hidden="true">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M10 11v6" />
-            <path d="M14 11v6" />
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-            <path d="M3 6h18" />
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-          </svg>
-        </span>
-        <div>
-          <h2 id="delete-title" class="m-0 font-serif text-2xl font-normal text-error">
-            Recept törlése
-          </h2>
-          <p id="delete-description" class="mt-2 mb-0 text-sm leading-relaxed text-base-content/75">
-            Biztosan törlöd a(z) <strong>{{ recipe()?.title }}</strong> receptet? Ez a művelet nem vonható vissza.
-          </p>
-        </div>
-      </div>
-      @if (deleteError()) {
-        <p class="m-0 text-sm text-error" role="alert">{{ deleteError() }}</p>
-      }
-      <form method="dialog" class="modal-action flex-col-reverse sm:flex-row">
-        <button
-          class="btn w-full sm:w-auto"
-          type="button"
-          [disabled]="isDeleting()"
-          (click)="closeDeleteConfirmation(deleteDialog)"
-        >
-          Mégse
-        </button>
-        <button
-          class="btn btn-error w-full sm:w-auto"
-          type="button"
-          [disabled]="isDeleting()"
-          (click)="deleteRecipe()"
-        >
-          @if (isDeleting()) {
-            <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
-          } @else {
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M10 11v6" />
-              <path d="M14 11v6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-              <path d="M3 6h18" />
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          }
-          Törlés véglegesen
-        </button>
-      </form>
-    </section>
-</dialog>
+@if (isDeleteOpen()) {
+  <app-recipe-delete-dialog
+    [isOpen]="true"
+    [recipeTitle]="recipe()?.title ?? ''"
+    [isDeleting]="isDeleting()"
+    [deleteError]="deleteError()"
+    (dismiss)="closeDeleteConfirmation()"
+    (confirm)="deleteRecipe()"
+  />
+}

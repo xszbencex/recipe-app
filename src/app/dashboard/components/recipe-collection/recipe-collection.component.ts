@@ -1,7 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import {
+  CATEGORY_TRANSLATION_MAP,
+  DIFFICULTY_TRANSLATION_MAP,
+} from '../../../shared/constants/translations.constants';
 import { Recipe } from '../../../shared/models/recipe.model';
+import { RECIPES_PATH } from '../../../shared/constants/router.constants';
 
 @Component({
   selector: 'app-recipe-collection',
@@ -11,20 +16,13 @@ import { Recipe } from '../../../shared/models/recipe.model';
 export class RecipeCollectionComponent {
   readonly recipes = input.required<Recipe[]>();
   readonly totalRecipes = input.required<number>();
-  readonly categories = input.required<string[]>();
-  readonly selectedCategory = input.required<string>();
-  readonly selectedDifficulty = input.required<string>();
+  readonly loadError = input<string | null>(null);
   readonly isLoading = input(false);
-  readonly categoryChange = output<string>();
-  readonly difficultyChange = output<string>();
+  readonly retryLoading = output<void>();
   readonly clearFilters = output<void>();
   readonly createRecipe = output<void>();
 
-  protected onDifficultyChange(event: Event): void {
-    this.difficultyChange.emit((event.target as HTMLSelectElement).value);
-  }
-
-  protected difficultyLabel(difficulty: Recipe['difficulty']): string {
-    return { easy: 'Könnyű', medium: 'Közepes', hard: 'Haladó' }[difficulty];
-  }
+  readonly difficultyTranslationMap = DIFFICULTY_TRANSLATION_MAP;
+  readonly categoryTranslationMap = CATEGORY_TRANSLATION_MAP;
+  readonly recipesPath = RECIPES_PATH;
 }

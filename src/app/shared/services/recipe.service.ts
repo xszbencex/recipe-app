@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import {
-  QueryConstraint,
   addDoc,
   collection,
   deleteDoc,
   doc,
   DocumentReference,
-  getDocs,
   getDoc,
+  getDocs,
   query,
+  QueryConstraint,
   serverTimestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
 import { auth, db } from '../../firebase.config';
-import { Recipe } from '../models/recipe.model';
+import { Recipe, RecipeCategory, RecipeDifficulty } from '../models/recipe.model';
 
 export interface RecipeFilters {
-  category?: string;
-  difficulty?: Recipe['difficulty'];
+  category?: RecipeCategory;
+  difficulty?: RecipeDifficulty;
   name?: string;
 }
 
