@@ -4,9 +4,16 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RecipeDeleteDialogComponent } from '../../../shared/components/recipe-delete-dialog/recipe-delete-dialog.component';
 import { RecipeFormDialogComponent } from '../../../shared/components/recipe-form-dialog/recipe-form-dialog.component';
 import { RECIPE_ID_ROUTE_PARAM } from '../../../shared/constants/router.constants';
-import { DIFFICULTY_TRANSLATION_MAP } from '../../../shared/constants/translations.constants';
+import {
+  CATEGORY_TRANSLATION_MAP,
+  DIFFICULTY_TRANSLATION_MAP,
+} from '../../../shared/constants/translations.constants';
 import { Recipe } from '../../../shared/models/recipe.model';
 import { RecipeService } from '../../../shared/services/recipe.service';
+import {
+  getIngredientSectionTitle,
+  isIngredientSection,
+} from '../../../shared/utils/ingredient.utils';
 
 @Component({
   imports: [DatePipe, RouterLink, RecipeDeleteDialogComponent, RecipeFormDialogComponent],
@@ -27,7 +34,10 @@ export class RecipeDetailContainerComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly recipeService = inject(RecipeService);
 
+  readonly categoryTranslationMap = CATEGORY_TRANSLATION_MAP;
   readonly difficultyTranslationMap = DIFFICULTY_TRANSLATION_MAP;
+  protected readonly isIngredientSection = isIngredientSection;
+  protected readonly ingredientSectionTitle = getIngredientSectionTitle;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get(RECIPE_ID_ROUTE_PARAM);

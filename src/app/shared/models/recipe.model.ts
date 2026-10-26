@@ -1,6 +1,13 @@
 import { Timestamp } from 'firebase/firestore';
 
-export const RECIPE_CATEGORIES = ['breakfast', 'lunch', 'dinner', 'sweets', 'other'] as const;
+export const RECIPE_CATEGORIES = [
+  'breakfast',
+  'soup',
+  'mainDish',
+  'dinner',
+  'sweets',
+  'other',
+] as const;
 export type RecipeCategory = (typeof RECIPE_CATEGORIES)[number];
 
 export const RECIPE_DIFFICULTIES = ['easy', 'medium', 'hard'] as const;

@@ -57,7 +57,10 @@
           <div
             class="mt-2 flex justify-between gap-2 border-t border-line-faint pt-3 text-xs text-base-content/60"
           >
-            <span>{{ recipe.ingredients.length }} hozzávaló · {{ recipe.steps.length }} lépés</span>
+            <span>
+              {{ ingredientCount(recipe.ingredients) }} hozzávaló ·
+              {{ recipe.steps.length }} lépés
+            </span>
             @if (recipe.createdAt; as createdAt) {
               <time>{{ createdAt.toDate() | date: 'yyyy. MMM d.' }}</time>
             }

@@ -7,6 +7,7 @@ import {
 } from '../../../shared/constants/translations.constants';
 import { Recipe } from '../../../shared/models/recipe.model';
 import { RECIPES_PATH } from '../../../shared/constants/router.constants';
+import { countIngredients } from '../../../shared/utils/ingredient.utils';
 
 @Component({
   selector: 'app-recipe-collection',
@@ -25,4 +26,5 @@ export class RecipeCollectionComponent {
   readonly difficultyTranslationMap = DIFFICULTY_TRANSLATION_MAP;
   readonly categoryTranslationMap = CATEGORY_TRANSLATION_MAP;
   readonly recipesPath = RECIPES_PATH;
+  protected readonly ingredientCount = countIngredients;
 }

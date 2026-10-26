@@ -8,7 +8,8 @@ export const DIFFICULTY_TRANSLATION_MAP: Record<RecipeDifficulty, string> = {
 
 export const CATEGORY_TRANSLATION_MAP: Record<RecipeCategory, string> = {
   breakfast: 'Reggeli',
-  lunch: 'Ebéd',
+  soup: 'Leves',
+  mainDish: 'Főétel',
   dinner: 'Vacsora',
   sweets: 'Sütemény',
   other: 'Egyéb',

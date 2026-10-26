@@ -51,7 +51,8 @@
 
       <div class="mx-auto w-full max-w-6xl px-5 pt-24 pb-8 sm:px-8 sm:pb-10 lg:px-10">
         <p class="mb-3 text-xs font-bold tracking-[0.18em] text-white/90 uppercase">
-          {{ recipe.category }} · {{ difficultyTranslationMap[recipe.difficulty] }}
+          {{ categoryTranslationMap[recipe.category] }} ·
+          {{ difficultyTranslationMap[recipe.difficulty] }}
         </p>
         <h1
           id="recipe-title"
@@ -76,13 +77,21 @@
           @if (recipe.ingredients.length) {
             <ul class="m-0 grid list-none gap-3 p-0">
               @for (ingredient of recipe.ingredients; track $index) {
-                <li class="flex items-start gap-3 leading-relaxed text-base-content/80">
-                  <span
-                    class="mt-2 size-2 shrink-0 rounded-full bg-earth"
-                    aria-hidden="true"
-                  ></span>
-                  <span>{{ ingredient }}</span>
-                </li>
+                @if (isIngredientSection(ingredient)) {
+                  <li class="pt-3">
+                    <h3 class="m-0 font-serif text-lg font-medium text-ink">
+                      {{ ingredientSectionTitle(ingredient) }}
+                    </h3>
+                  </li>
+                } @else {
+                  <li class="flex items-start gap-3 leading-relaxed text-base-content/80">
+                    <span
+                      class="mt-2 size-2 shrink-0 rounded-full bg-earth"
+                      aria-hidden="true"
+                    ></span>
+                    <span>{{ ingredient }}</span>
+                  </li>
+                }
               }
             </ul>
           } @else {
