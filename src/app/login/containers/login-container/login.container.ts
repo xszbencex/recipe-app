@@ -6,11 +6,7 @@ import { FirebaseError } from 'firebase/app';
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
-  selector: 'app-login',
   imports: [NgOptimizedImage, ReactiveFormsModule, RouterLink],
-  host: {
-    class: 'block min-h-screen bg-base-200 font-sans text-base-content',
-  },
   templateUrl: './login.container.html',
 })
 export class LoginComponent {

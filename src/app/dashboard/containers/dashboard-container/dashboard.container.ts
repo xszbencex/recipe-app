@@ -22,9 +22,6 @@ import {
     RecipeFormDialogComponent,
     NgClass,
   ],
-  host: {
-    class: 'block min-h-screen bg-base-200 font-sans text-base-content',
-  },
   templateUrl: './dashboard.container.html',
 })
 export class DashboardContainerComponent implements OnInit {

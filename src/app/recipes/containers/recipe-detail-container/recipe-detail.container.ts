@@ -10,9 +10,6 @@ import { RecipeService } from '../../../shared/services/recipe.service';
 
 @Component({
   imports: [DatePipe, RouterLink, RecipeDeleteDialogComponent, RecipeFormDialogComponent],
-  host: {
-    class: 'block min-h-screen bg-base-200 font-sans text-base-content',
-  },
   templateUrl: './recipe-detail.container.html',
 })
 export class RecipeDetailContainerComponent implements OnInit {
