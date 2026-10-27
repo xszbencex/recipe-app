@@ -99,3 +99,17 @@
     }
   </section>
 }
+
+<div class="mt-8 flex flex-col items-center gap-2 border-t border-base-300 pt-6">
+  <button
+    class="btn btn-outline"
+    type="button"
+    [disabled]="isLoading() || !!loadError() || totalRecipes() === 0"
+    (click)="exportAll.emit()"
+  >
+    Összes recept exportálása JSON-ként
+  </button>
+  <p class="m-0 text-center text-sm text-muted">
+    A teljes receptgyűjtemény letöltése biztonsági mentésként.
+  </p>
+</div>

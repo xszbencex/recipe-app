@@ -112,4 +112,22 @@ export class DashboardContainerComponent implements OnInit {
     await this.auth.signOut();
     await this.router.navigateByUrl('/login');
   }
+
+  protected exportRecipes(): void {
+    const recipes = this.recipes().map((recipe) => ({
+      ...recipe,
+      createdAt: recipe.createdAt?.toDate().toISOString() ?? null,
+    }));
+    const backup = new Blob([JSON.stringify(recipes, null, 2)], {
+      type: 'application/json',
+    });
+    const downloadUrl = URL.createObjectURL(backup);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = downloadUrl;
+    downloadLink.download = `receptek-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 0);
+  }
 }

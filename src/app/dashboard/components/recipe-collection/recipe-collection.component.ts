@@ -22,6 +22,7 @@ export class RecipeCollectionComponent {
   readonly retryLoading = output<void>();
   readonly clearFilters = output<void>();
   readonly createRecipe = output<void>();
+  readonly exportAll = output<void>();
 
   readonly difficultyTranslationMap = DIFFICULTY_TRANSLATION_MAP;
   readonly categoryTranslationMap = CATEGORY_TRANSLATION_MAP;
